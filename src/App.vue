@@ -29,6 +29,14 @@ export default {
     }
   },
 
+  computed: {
+    answers() {
+      var answers = JSON.parse(JSON.stringify(this.incorrectAnswers) );
+      answers.push(this.defineComponent);
+      return answers;
+    }
+  },
+
   created(){
     this.axios
     .get('https://opentdb.com/api.php?amount=1&category=18')

@@ -32,7 +32,7 @@ export default {
   computed: {
     answers() {
       var answers = JSON.parse(JSON.stringify(this.incorrectAnswers) );
-      answers.push(this.defineComponent);
+      answers.splice(Math.round(Math.random() * answers.length), 0, this.correctAnswers);
       return answers;
     }
   },
@@ -42,7 +42,7 @@ export default {
     .get('https://opentdb.com/api.php?amount=1&category=18')
     .then((response) => {
       this.question = response.data.results[0].question;
-      this. incorrectAnswers = response.data.results[0].incorrect_answers;
+      this.incorrectAnswers = response.data.results[0].incorrect_answers;
       this.correctAnswer = response.data.results[0].correct_answer;
     }) 
   }

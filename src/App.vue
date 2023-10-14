@@ -1,7 +1,7 @@
 <template>
   <div>
 
-      <template v-if="this.answers">
+      <template v-if="this.answers" >
 
         <h1 v-html="this.question">
         </h1>
@@ -10,12 +10,14 @@
             <input 
             type="radio" 
             name="options" 
-            value="answer">
+            :value="answer"
+            v-model="this.chosen_answer"
+            >
 
             <label v-html="answer"></label><br>
           </tamplate>
 
-          <button class="send" type="button">Send</button>
+          <button @click="this.submitAnswer()" class="send" type="button">Send</button>
       
         </template>
       
@@ -42,6 +44,20 @@ export default {
       var answers = JSON.parse(JSON.stringify(this.incorrectAnswers) );
       answers.splice(Math.round(Math.random() * answers.length), 0, this.correctAnswers);
       return answers;
+    }
+  },
+  methods: {
+
+    submitAnswer() {
+      if (!this.chosen_answer){
+        alert('Pick one of the options');
+      } else{
+        if (this.chosen_answer == this.correctAnswer){
+          alert('You got right!')
+        } else {
+          alert('You got it wrong!')
+        }
+      }
     }
   },
 

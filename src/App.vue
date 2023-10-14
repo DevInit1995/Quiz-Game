@@ -1,89 +1,98 @@
 <template>
-  <div>
+    <div>
 
-      <template v-if="this.answers" >
+        <template v-if="this.answers" >
+          <h1 v-html="this.question">
+          </h1>
 
-        <h1 v-html="this.question">
-        </h1>
+            <tamplate v-for="(answer, index) in this.answers" v-bind:key="index">
+              <input 
+              :disabled="this.answerSubmitted"
+              type="radio" 
+              name="options" 
+              :value="answer"
+              v-model="this.chosenAnswer"
+              >
 
-          <tamplate v-for="(answer, index) in this.answers" v-bind:key="index">
-            <input 
-            :disabled="this.answerSubmitted"
-            type="radio" 
-            name="options" 
-            :value="answer"
-            v-model="this.chosenAnswer"
-            >
+              <label v-html="answer"></label><br>
+            </tamplate>
 
-            <label v-html="answer"></label><br>
-          </tamplate>
+            <button v-if="!this.answerSubmitted" @click="this.submitAnswer()" class="send" type="button">Send</button>
+        
+            <section v-if="this.answerSubmitted" class="result">
+                <h4 v-if="this.chosenAnswer == this.correct_answer"
+                v-html="'&#9989; Congratulations, the answer ' + this.correctAnswer + ' is correct.'">
+                
+                </h4>
+                <h4 v-else
+                v-html="'&#10060; I´m sorry, you picked the wrong answer. The correct is ' + this.correctAnswer + '.'">
+                </h4>
+                <button @click="this.getNewQuestion()" class="send" type="button">Nest question</button>
+            </section>
 
-          <button v-if="!this.answerSubmitted" @click="this.submitAnswer()" class="send" type="button">Send</button>
+          </template>
+        
+        </div>
       
-          <section v-if="this.answerSubmitted" class="result">
-              <h4 v-if="this.chosenAnswer == this.correct_answer">
-                &#9989; Congratulations, the answer "{{ this.chosenAnswer }}" is correct.
-              </h4>
-              <h4 v-else>
-                &#10060; I'm sorry, you picked the wrong answer.The correct is "{{this.correct_answer }}".
-              </h4>
-              <button class="send" type="button">Nest question</button>
-          </section>
-
-        </template>
-      
-      </div>
-      
-    </template>
+</template>
 
 
 <script>
 
 export default {
-  name: 'App',
+    name: 'App',
 
-  data(){
-    return {
-      question: undefined,
-      incorrectAnswers: undefined,
-      correctAnswer: undefined,
-      chosenAnswer: undefined,
-      answerSubmitted: false
-    }
-  },
-
-  computed: {
-    answers() {
-      var answers = JSON.parse(JSON.stringify(this.incorrectAnswers) );
-      answers.splice(Math.round(Math.random() * answers.length), 0, this.correctAnswers);
-      return answers;
-    }
-  },
-  methods: {
-
-    submitAnswer() {
-      if (!this.chosenAnswer){
-        alert('Pick one of the options');
-      } else {
-        this.answerSubmitted = true;
-        if (this.chosenAnswer == this.correctAnswer){
-          console.log('You got right!')
-        } else {
-          console.log('You got it wrong!')
-        }
+    data(){
+      return {
+        question: undefined,
+        inchosenAnswers:[],
+        chosenAnswer: undefined,
+        answerSubmitted: false
       }
-    }
-  },
+    },
 
+    computed: {
+      answers() {
+        var answers = JSON.parse(JSON.stringify(this.inchosenAnswers) );
+        answers.splice(Math.round(Math.random() * answers.length), 0, this.chosenAnswers);
+        return answers;
+      }
+    },
+    methods: {
+
+      submitAnswer() {
+        if (!this.chosenAnswer){
+          alert('Pick one of the options');
+        } else {
+          this.answerSubmitted = true;
+          if (this.chosenAnswer == this.chosenAnswer){
+            console.log('You got right!')
+          } else {
+            console.log('You got it wrong!')
+          }
+        }
+      },
+
+      getNewQuestion() {
+
+        this.answerSubmitted = false;
+        this.chosenAnswer = undefined;
+        this.question = undefined;
+        
+          this.axios
+          .get('https://opentdb.com/api.php?amount=1&category=18')
+          .then((response) => {
+            this.question = response.data.results[0].question;
+            this.inchosenAnswers = response.data.results[0].incorrect_answers;
+            this.chosenAnswer = response.data.results[0].correct_answer;
+      });
+    }
+ },
   created(){
-    this.axios
-    .get('https://opentdb.com/api.php?amount=1&category=18')
-    .then((response) => {
-      this.question = response.data.results[0].question;
-      this.incorrectAnswers = response.data.results[0].incorrect_answers;
-      this.correctAnswer = response.data.results[0].correct_answer;
-    }) 
+    this.getNewQuestion();
+  
   }
+  
 }
 
 </script>
